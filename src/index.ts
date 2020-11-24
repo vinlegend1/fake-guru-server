@@ -6,6 +6,7 @@ import cors from 'cors';
 import userRouter from './routes/user';
 import "./passport-config"
 import { connOptions } from "./constants";
+import cookieParser from "cookie-parser";
 
 const main = async () => {
     const app = express();
@@ -14,6 +15,7 @@ const main = async () => {
     app.use(passport.initialize());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
+    app.use(cookieParser())
 
     const conn = await createConnection(connOptions);
 

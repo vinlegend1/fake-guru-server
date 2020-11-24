@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
     if (req.isAuthenticated()) {
         const { id } = req.user as User;
-        const token = signToken(`${id}`);
+        const token = signToken(id);
         res.cookie(cookieName, token, { httpOnly: true, sameSite: true });
         console.log(token);
         res.status(200).json(createIsAuthMessage(true, req.user as User));
