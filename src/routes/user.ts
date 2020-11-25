@@ -42,11 +42,16 @@ router.post('/login', passport.authenticate('local', { session: false }), (req, 
 
 router.get('/me', passport.authenticate('jwt', { session: false }), (req, res) => {
     const { id, email, username } = req.user as any;
-    res.send({
+    res.json({
         id,
         email,
         username
     });
+});
+
+router.get('/logout', passport.authenticate('jwt', { session: false }), (_, res) => {
+    res.clearCookie(cookieName);
+    res.json(createMessage("logout success", false));
 })
 
 export default router;
