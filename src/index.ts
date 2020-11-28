@@ -25,7 +25,6 @@ const main = async () => {
     // await conn.createQueryBuilder()
     //     .delete()
     //     .from(User)
-    //     .where("username= :username", { username: "ben" })
     //     .execute();
     // await conn.runMigrations();
 
