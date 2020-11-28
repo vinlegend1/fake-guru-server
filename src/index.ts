@@ -4,6 +4,7 @@ import { createConnection } from "typeorm";
 import passport from "passport";
 import cors from 'cors';
 import userRouter from './routes/user';
+import postRouter from './routes/post';
 import "./passport-config"
 import { connOptions } from "./constants";
 import cookieParser from "cookie-parser";
@@ -33,6 +34,7 @@ const main = async () => {
     });
 
     app.use('/api/user', userRouter);
+    app.use('/api/post', postRouter);
 
     app.listen(5000, () => {
         console.log('listening on port 5000');
