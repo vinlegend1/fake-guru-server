@@ -2,7 +2,7 @@ import { PostCategory } from "../types";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity } from "typeorm";
 import { Board } from "./Board";
 import { User } from "./User";
-import { Activity } from "./Activity";
+import { Like } from "./Like";
 
 @Entity()
 export class Post extends BaseEntity {
@@ -28,8 +28,11 @@ export class Post extends BaseEntity {
     @Column({ nullable: true })
     media: string; // possibly array of strings... let's see
 
-    @OneToMany(() => Activity, activity => activity.parent)
-    activity: Activity;
+    @OneToMany(() => Like, like => like.post)
+    likes: Like[];
+
+    @Column({ type: "int", default: 0 })
+    value: number;
 
     @Column()
     createdAt: Date;
