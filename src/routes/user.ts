@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
         username,
         password: hashedPassword
     }).catch((err) => {
-        res.json(createMessage(err.message, true));
+        res.status(400).json(createMessage(err.message, true));
         return;
     });
 
