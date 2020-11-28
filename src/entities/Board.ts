@@ -1,9 +1,9 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Follow } from "./Follow";
 import { Post } from "./Post";
 
 @Entity()
-export class Board {
+export class Board extends BaseEntity {
     @PrimaryGeneratedColumn()
     boardId: number;
 

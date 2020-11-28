@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { createMessage } from '../utils/createMessage';
 import passport from 'passport';
 import { getRepository } from 'typeorm';
 import { Post } from '../entities/Post';

@@ -1,12 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, ManyToOne, BaseEntity } from "typeorm";
 import { Board } from "./Board";
 import { User } from "./User";
 
 @Entity()
-export class Follow {
+export class Follow extends BaseEntity {
 
-    @PrimaryGeneratedColumn()
-    followId: number;
+    @PrimaryGeneratedColumn({ type: "uuid" })
+    followId: string;
 
     @ManyToOne(() => User, user => user.posts)
     user: User;
