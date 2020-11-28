@@ -1,6 +1,5 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { getRepository } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { User } from './entities/User';
 import { Strategy as JWTStrategy, StrategyOptions } from 'passport-jwt';
@@ -21,8 +20,7 @@ const JWTOptions: StrategyOptions = {
 }
 
 passport.use(new JWTStrategy(JWTOptions, async (req: any, payload: any, done: any) => {
-    const userRepository = getRepository(User);
-    const user = await userRepository.findOne({ id: payload.sub })
+    const user: User = await User.findOne({ where: { id: payload.sub } })
         .catch(err => {
             return done(err);
         });
@@ -33,7 +31,7 @@ passport.use(new JWTStrategy(JWTOptions, async (req: any, payload: any, done: an
 
 passport.use(new LocalStrategy(async (username, password, done) => {
 
-    const user = await getRepository(User).findOne({ username })
+    const user = await User.findOne({ where: { username } })
     console.log(user);
 
     if (!user) return done(null, false);
