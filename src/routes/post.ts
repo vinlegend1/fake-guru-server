@@ -69,6 +69,6 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), async (req,
     }
 
     return res.json(post);
-})
+});
 
 export default router;
