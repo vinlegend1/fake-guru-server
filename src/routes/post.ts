@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { getRepository } from 'typeorm';
 import { Post } from '../entities/Post';
 
 const router = Router();
@@ -15,8 +14,7 @@ router.get('/from/:username', passport.authenticate('jwt', { session: false }), 
     const limit: number = typeof l !== "string" ? 10 : parseInt(l);
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const postRepository = getRepository(Post);
-    const post = await postRepository.find({
+    const post = await Post.find({
         order: {
             createdAt: "DESC"
         },

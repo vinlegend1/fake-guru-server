@@ -16,7 +16,7 @@ export class Board extends BaseEntity {
     @OneToMany(() => Follow, follow => follow.board)
     followers: Follow[];
 
-    @OneToMany(() => Post, post => post.fromBoard)
+    @OneToMany(() => Post, post => post.board)
     posts: Post[]
 
     @CreateDateColumn()

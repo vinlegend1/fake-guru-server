@@ -20,5 +20,5 @@ export class Comment extends BaseEntity {
     likes: Like[];
 
     @OneToMany(() => Reply, reply => reply.parentComment)
-    replies: Reply;
+    replies: Reply[];
 }

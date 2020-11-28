@@ -1,5 +1,5 @@
 import { PostCategory } from "../types";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity, JoinColumn } from "typeorm";
 import { Board } from "./Board";
 import { User } from "./User";
 import { Like } from "./Like";
@@ -16,11 +16,23 @@ export class Post extends BaseEntity {
     @Column()
     body: string;
 
+    // === User ===
+
+    @Column()
+    creatorId: number;
+
     @ManyToOne(() => User, user => user.posts)
+    @JoinColumn({ name: "creatorId" })
     creator: User;
 
+    // === Board ===
+
+    @Column()
+    boardId: number;
+
     @ManyToOne(() => Board, board => board.posts, { nullable: true })
-    fromBoard: Board;
+    @JoinColumn({ name: "boardId" })
+    board: Board;
 
     @Column()
     category: PostCategory;
