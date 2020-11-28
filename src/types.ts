@@ -3,6 +3,8 @@ export interface ResponseMessage {
     error: boolean;
 }
 
+export type PostCategory = "regular" | "proof" | "disproof";
+
 // export interface UserType extends User {
 //     User_id: number;
 //     User_username: string;
