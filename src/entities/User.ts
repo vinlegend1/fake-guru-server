@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from "typeorm";
+import { Follow } from "./Follow";
+import { Post } from "./Post";
 
 @Entity()
 export class User {
@@ -12,7 +14,16 @@ export class User {
     @Column({ unique: true })
     email: string;
 
+    @OneToMany(() => Post, post => post.creator)
+    posts: Post[];
+
+    @OneToMany(() => Follow, follow => follow.user)
+    follows: Follow[];
+
     @Column()
     password: string;
+
+    @CreateDateColumn()
+    createdAt: Date;
 
 }
