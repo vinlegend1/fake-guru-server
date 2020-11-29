@@ -4,6 +4,7 @@ import { User } from '../entities/User';
 import { Post } from '../entities/Post';
 import { createMessage } from '../utils/createMessage';
 import { Board } from '../entities/Board';
+import { getConnection } from 'typeorm';
 
 const router = Router();
 
@@ -15,17 +16,26 @@ router.get('/from/board/:boardId', async (req, res) => {
     const limit: number = typeof l !== "string" ? 10 : parseInt(l);
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const posts = await Post.find({
-        order: {
-            createdAt: "DESC"
-        },
-        take: limit,
-        skip: page * limit,
-        where: {
-            boardId
-        },
-        relations: ['creator', 'board']
-    })
+    // const posts = await Post.find({
+    //     order: {
+    //         createdAt: "DESC"
+    //     },
+    //     take: limit,
+    //     skip: page * limit,
+    //     where: {
+    //         boardId
+    //     },
+    //     relations: ['creator', 'board']
+    // })
+
+    const posts = await getConnection().query(`
+        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        inner join board b on p."boardId" = b."boardId"
+        inner join "user" u on p."creatorId" = u.id
+        where b."boardId" = ${boardId}
+        order by p."createdAt" desc
+        limit ${limit} offset ${page * limit};
+    `)
 
     return res.json(posts)
 });

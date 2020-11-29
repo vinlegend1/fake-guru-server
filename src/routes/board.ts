@@ -6,7 +6,16 @@ import { createMessage } from '../utils/createMessage';
 const router = Router();
 
 router.get('/get/name/:boardName', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { boardName } = req.params;
 
+    const board = await Board.findOne({ where: { boardName } });
+
+    if (!board) {
+        res.status(400).json(createMessage("board not found", true));
+        return;
+    }
+
+    res.json(board);
 });
 
 router.get('/get', async (req, res) => {
@@ -27,7 +36,15 @@ router.get('/get', async (req, res) => {
 });
 
 router.get('/:boardId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { boardId } = req.params;
 
+    const board = await Board.findOne(boardId);
+
+    if (!board) {
+        res.status(400).json(createMessage("board not found", true));
+        return;
+    }
+    res.json(board);
 });
 
 router.post('/new', passport.authenticate('jwt', { session: false }), async (req, res) => {
