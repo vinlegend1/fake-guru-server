@@ -1,13 +1,11 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Like } from "./Like";
+import { ReplyLike } from "./ReplyLike";
 import { Comment } from './Comment';
 
 @Entity()
 export class Reply extends BaseEntity {
     @PrimaryGeneratedColumn()
     replyId: number;
-
-    // === ParentComment ===
 
     @Column()
     parentCommentId: number;
@@ -16,8 +14,8 @@ export class Reply extends BaseEntity {
     @JoinColumn({ name: "parentCommentId" })
     parentComment: Comment;
 
-    @OneToMany(() => Like, like => like.reply)
-    likes: Like[];
+    @OneToMany(() => ReplyLike, like => like.reply)
+    likes: ReplyLike[];
 
     @Column({ type: "int", default: 0 })
     value: number;

@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Like } from "./Like";
+import { CommentLike } from "./CommentLike";
 import { Reply } from "./Reply";
 
 @Entity()
@@ -16,8 +16,8 @@ export class Comment extends BaseEntity {
     @Column({ type: "int", default: 0 })
     value: number;
 
-    @OneToMany(() => Like, like => like.comment)
-    likes: Like[];
+    @OneToMany(() => CommentLike, like => like.comment)
+    likes: CommentLike[];
 
     @OneToMany(() => Reply, reply => reply.parentComment)
     replies: Reply[];
