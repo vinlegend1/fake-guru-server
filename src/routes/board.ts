@@ -5,15 +5,28 @@ import { createMessage } from '../utils/createMessage';
 
 const router = Router();
 
-router.get('/get/:boardName', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.get('/get/name/:boardName', passport.authenticate('jwt', { session: false }), async (req, res) => {
 
+});
+
+router.get('/get', async (req, res) => {
+    const { l, p } = req.query;
+
+    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const page: number = typeof p !== "string" ? 0 : parseInt(p);
+
+    const boards = await Board.find({
+        order: {
+            createdAt: "DESC"
+        },
+        take: limit,
+        skip: page,
+    })
+
+    return res.json(boards)
 });
 
 router.get('/:boardId', passport.authenticate('jwt', { session: false }), async (req, res) => {
-
-});
-
-router.get('/get/all', async (req, res) => {
 
 });
 

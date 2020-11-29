@@ -9,7 +9,7 @@ import boardRouter from './routes/board';
 import "./passport-config"
 import { connOptions } from "./constants";
 import cookieParser from "cookie-parser";
-import { Post } from "./entities/Post";
+// import { Post } from "./entities/Post";
 
 const main = async () => {
     const app = express();

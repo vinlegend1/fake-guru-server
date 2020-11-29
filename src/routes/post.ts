@@ -20,10 +20,11 @@ router.get('/from/board/:boardId', async (req, res) => {
             createdAt: "DESC"
         },
         take: limit,
-        skip: page,
+        skip: page * limit,
         where: {
             boardId
-        }
+        },
+        relations: ['creator', 'board']
     })
 
     return res.json(posts)
@@ -47,10 +48,11 @@ router.get('/from/board/name/:boardName', async (req, res) => {
             createdAt: "DESC"
         },
         take: limit,
-        skip: page,
+        skip: page * limit,
         where: {
             boardId: board.boardId
-        }
+        },
+        relations: ['creator', 'board']
     })
 
     return res.json(posts)
@@ -82,10 +84,11 @@ router.get('/from/:username', passport.authenticate('jwt', { session: false }), 
             createdAt: "DESC"
         },
         take: limit,
-        skip: page,
+        skip: page * limit,
         where: {
             creatorId: user.id
-        }
+        },
+        relations: ['creator', 'board']
     })
 
     return res.json(posts)
@@ -104,10 +107,11 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
             createdAt: "DESC"
         },
         take: limit,
-        skip: page,
+        skip: page * limit,
         where: {
             creatorId: parseInt(id)
-        }
+        },
+        relations: ['creator', 'board']
     })
 
     return res.json(posts)
@@ -118,7 +122,7 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { id } = req.params;
 
-    const post = await Post.findOne({ where: { postId: parseInt(id) } });
+    const post = await Post.findOne({ where: { postId: parseInt(id) }, relations: ['creator', 'board'] });
 
     if (!post) {
         return res.status(400).json(createMessage("Post not found", true));

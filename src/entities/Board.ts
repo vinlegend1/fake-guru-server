@@ -13,6 +13,9 @@ export class Board extends BaseEntity {
     @Column()
     boardDescription: string;
 
+    @Column({ type: "float", default: 0 })
+    popularity: number;
+
     @OneToMany(() => Follow, follow => follow.board)
     followers: Follow[];
 
@@ -21,5 +24,4 @@ export class Board extends BaseEntity {
 
     @CreateDateColumn()
     createdAt: Date;
-
 }
