@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ReplyLike } from "./ReplyLike";
 import { Comment } from './Comment';
 
@@ -19,4 +19,7 @@ export class Reply extends BaseEntity {
 
     @Column({ type: "int", default: 0 })
     value: number;
+
+    @CreateDateColumn()
+    createdAt: Date;
 }

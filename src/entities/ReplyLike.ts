@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Reply } from "./Reply";
 import { User } from "./User";
 
@@ -18,4 +18,7 @@ export class ReplyLike extends BaseEntity {
     @ManyToOne(() => Reply, reply => reply.likes)
     @JoinColumn({ name: "replyId" })
     reply: Reply;
+
+    @CreateDateColumn()
+    createdAt: Date;
 }

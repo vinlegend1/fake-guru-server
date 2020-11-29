@@ -1,5 +1,5 @@
 import { PostCategory } from "../types";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity, JoinColumn, CreateDateColumn } from "typeorm";
 import { Board } from "./Board";
 import { User } from "./User";
 import { PostLike } from "./PostLike";
@@ -34,7 +34,11 @@ export class Post extends BaseEntity {
     @JoinColumn({ name: "boardId" })
     board: Board;
 
-    @Column()
+    @Column({
+        type: "enum",
+        enum: PostCategory,
+        default: PostCategory.post
+    })
     category: PostCategory;
 
     @Column({ nullable: true })
@@ -46,6 +50,6 @@ export class Post extends BaseEntity {
     @Column({ type: "int", default: 0 })
     value: number;
 
-    @Column()
+    @CreateDateColumn()
     createdAt: Date;
 }

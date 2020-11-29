@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { CommentLike } from "./CommentLike";
 import { Reply } from "./Reply";
 
@@ -21,4 +21,7 @@ export class Comment extends BaseEntity {
 
     @OneToMany(() => Reply, reply => reply.parentComment)
     replies: Reply[];
+
+    @CreateDateColumn()
+    createdAt: Date;
 }

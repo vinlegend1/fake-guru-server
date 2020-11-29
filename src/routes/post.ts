@@ -3,12 +3,11 @@ import passport from 'passport';
 import { User } from '../entities/User';
 import { Post } from '../entities/Post';
 import { createMessage } from '../utils/createMessage';
-import { Board } from 'src/entities/Board';
+import { Board } from '../entities/Board';
 
 const router = Router();
 
 // ======================= Find by Board -- Start -- ===========================================
-
 router.get('/from/board/:boardId', async (req, res) => {
     const { boardId } = req.params;
     const { l, p } = req.query;
@@ -140,16 +139,102 @@ router.post('/new/to/:boardName', passport.authenticate('jwt', { session: false 
         return;
     }
 
-    const newPost = await Post.create({
-        title,
-        body,
-        creatorId: user.id,
-        boardId: board.boardId,
-        media,
-        category
-    }).save();
+    if (!media) {
+        const newPost = await Post.create({
+            title,
+            body,
+            creatorId: user.id,
+            boardId: board.boardId,
+            category
+        }).save()
+            .catch((err) => {
+                if (err.code === "23503") {
+                    res.status(400).json(createMessage("Board does not exist", true));
+                    return;
+                } else if (err.code === "22P02") {
+                    res.status(400).json(createMessage("Invalid category", true));
+                    return;
+                }
+                res.status(500).json(createMessage("Something went wrong", true));
+                return;
+            });
 
-    res.json(newPost);
+        res.json(newPost);
+    } else {
+        const newPost = await Post.create({
+            title,
+            body,
+            creatorId: user.id,
+            boardId: board.boardId,
+            category
+        }).save()
+            .catch((err) => {
+                if (err.code === "23503") {
+                    res.status(400).json(createMessage("Board does not exist", true));
+                    return;
+                } else if (err.code === "22P02") {
+                    res.status(400).json(createMessage("Invalid category", true));
+                    return;
+                }
+                res.status(500).json(createMessage("Something went wrong", true));
+                return;
+            });
+        res.json(newPost);
+    }
+});
+
+router.post('/new/:boardId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const user = req.user as User;
+    const { title, body, media, category } = req.body;
+    const { boardId } = req.params;
+
+    if (!boardId) {
+        res.status(400).json(createMessage("You messed with the wrong Barbie", true));
+        return;
+    }
+
+    if (!media) {
+        const newPost = await Post.create({
+            title,
+            body,
+            creatorId: user.id,
+            boardId: parseInt(boardId),
+            category
+        }).save()
+            .catch((err) => {
+                if (err.code === "23503") {
+                    res.status(400).json(createMessage("Board does not exist", true));
+                    return;
+                } else if (err.code === "22P02") {
+                    res.status(400).json(createMessage("Invalid category", true));
+                    return;
+                }
+                res.status(500).json(createMessage("Something went wrong", true));
+                return;
+            });
+
+        res.json(newPost);
+    } else {
+        const newPost = await Post.create({
+            title,
+            body,
+            creatorId: user.id,
+            boardId: parseInt(boardId),
+            category
+        }).save()
+            .catch((err) => {
+                if (err.code === "23503") {
+                    res.status(400).json(createMessage("Board does not exist", true));
+                    return;
+                } else if (err.code === "22P02") {
+                    res.status(400).json(createMessage("Invalid category", true));
+                    return;
+                }
+                res.status(500).json(createMessage("Something went wrong", true));
+                return;
+            });
+        res.json(newPost);
+    }
 });
 
 export default router;

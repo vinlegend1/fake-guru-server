@@ -3,7 +3,13 @@ export interface ResponseMessage {
     error: boolean;
 }
 
-export type PostCategory = "regular" | "proof" | "disproof";
+// export type PostCategory = "post" | "proof" | "disproof";
+
+export enum PostCategory {
+    post = "post",
+    proof = "proof",
+    disproof = "disproof"
+}
 
 // export interface UserType extends User {
 //     User_id: number;

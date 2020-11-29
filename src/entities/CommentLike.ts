@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { User } from "./User";
 import { Comment } from "./Comment";
 
@@ -19,4 +19,6 @@ export class CommentLike extends BaseEntity {
     @JoinColumn({ name: "commentId" })
     comment: Comment;
 
+    @CreateDateColumn()
+    createdAt: Date;
 }
