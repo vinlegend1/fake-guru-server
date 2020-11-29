@@ -5,9 +5,11 @@ import passport from "passport";
 import cors from 'cors';
 import userRouter from './routes/user';
 import postRouter from './routes/post';
+import boardRouter from './routes/board';
 import "./passport-config"
 import { connOptions } from "./constants";
 import cookieParser from "cookie-parser";
+// import { Post } from "./entities/Post";
 
 const main = async () => {
     const app = express();
@@ -25,7 +27,7 @@ const main = async () => {
 
     // await conn.createQueryBuilder()
     //     .delete()
-    //     .from(User)
+    //     .from(Post)
     //     .execute();
     // await conn.runMigrations();
 
@@ -35,6 +37,7 @@ const main = async () => {
 
     app.use('/api/user', userRouter);
     app.use('/api/post', postRouter);
+    app.use('/api/board', boardRouter);
 
     app.listen(5000, () => {
         console.log('listening on port 5000');

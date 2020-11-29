@@ -1,0 +1,72 @@
+import { Router } from 'express';
+import passport from 'passport';
+import { Board } from '../entities/Board';
+import { createMessage } from '../utils/createMessage';
+
+const router = Router();
+
+router.get('/get/name/:boardName', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { boardName } = req.params;
+
+    const board = await Board.findOne({ where: { boardName } });
+
+    if (!board) {
+        res.status(400).json(createMessage("board not found", true));
+        return;
+    }
+
+    res.json(board);
+});
+
+router.get('/get', async (req, res) => {
+    const { l, p } = req.query;
+
+    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const page: number = typeof p !== "string" ? 0 : parseInt(p);
+
+    const boards = await Board.find({
+        order: {
+            createdAt: "DESC"
+        },
+        take: limit,
+        skip: page,
+    })
+
+    return res.json(boards)
+});
+
+router.get('/:boardId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { boardId } = req.params;
+
+    const board = await Board.findOne(boardId);
+
+    if (!board) {
+        res.status(400).json(createMessage("board not found", true));
+        return;
+    }
+    res.json(board);
+});
+
+router.post('/new', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { boardName, boardDescription } = req.body;
+
+    if (!boardName || !boardDescription) {
+        res.status(400).json(createMessage("No name or description", true));
+        return;
+    }
+
+    (boardName as string).replace(" ", "_");
+
+    const newBoard = await Board.create({
+        boardName,
+        boardDescription
+    }).save()
+        .catch((_) => {
+            res.status(500).json(createMessage("Something went wrong", true));
+            return;
+        });
+
+    res.json(newBoard);
+})
+
+export default router;

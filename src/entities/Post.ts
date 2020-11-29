@@ -1,8 +1,8 @@
 import { PostCategory } from "../types";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntity, JoinColumn, CreateDateColumn } from "typeorm";
 import { Board } from "./Board";
 import { User } from "./User";
-import { Like } from "./Like";
+import { PostLike } from "./PostLike";
 
 @Entity()
 export class Post extends BaseEntity {
@@ -16,24 +16,40 @@ export class Post extends BaseEntity {
     @Column()
     body: string;
 
-    @ManyToOne(() => User, user => user.posts)
-    creator: User;
-
-    @ManyToOne(() => Board, board => board.posts, { nullable: true })
-    fromBoard: Board;
+    // === User ===
 
     @Column()
+    creatorId: number;
+
+    @ManyToOne(() => User, user => user.posts)
+    @JoinColumn({ name: "creatorId" })
+    creator: User;
+
+    // === Board ===
+
+    @Column()
+    boardId: number;
+
+    @ManyToOne(() => Board, board => board.posts, { nullable: true })
+    @JoinColumn({ name: "boardId" })
+    board: Board;
+
+    @Column({
+        type: "enum",
+        enum: PostCategory,
+        default: PostCategory.post
+    })
     category: PostCategory;
 
     @Column({ nullable: true })
     media: string; // possibly array of strings... let's see
 
-    @OneToMany(() => Like, like => like.post)
-    likes: Like[];
+    @OneToMany(() => PostLike, like => like.post)
+    likes: PostLike[];
 
     @Column({ type: "int", default: 0 })
     value: number;
 
-    @Column()
+    @CreateDateColumn()
     createdAt: Date;
 }

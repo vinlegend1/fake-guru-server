@@ -15,12 +15,17 @@ router.post('/register', async (req, res) => {
     const userRepository = getRepository(User);
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    if (!username || !password || !email) {
+        res.status(400).json(createMessage("Some fields are missing", true));
+        return;
+    }
+
     await userRepository.insert({
         email,
         username,
         password: hashedPassword
-    }).catch((err) => {
-        res.json(createMessage(err.message, true));
+    }).catch((_) => {
+        res.status(400).json(createMessage("Something went wrong", true));
         return;
     });
 
