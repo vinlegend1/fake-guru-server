@@ -1,11 +1,19 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ReplyLike } from "./ReplyLike";
 import { Comment } from './Comment';
+import { User } from "./User";
 
 @Entity()
 export class Reply extends BaseEntity {
     @PrimaryGeneratedColumn()
     replyId: number;
+
+    @Column()
+    creatorId: number;
+
+    @ManyToOne(() => User, user => user.replies)
+    @JoinColumn({ name: 'creatorId' })
+    creator: User;
 
     @Column()
     parentCommentId: number;

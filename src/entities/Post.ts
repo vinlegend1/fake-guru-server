@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BaseEntit
 import { Board } from "./Board";
 import { User } from "./User";
 import { PostLike } from "./PostLike";
+import { Comment } from "./Comment";
 
 @Entity()
 export class Post extends BaseEntity {
@@ -40,6 +41,9 @@ export class Post extends BaseEntity {
         default: PostCategory.post
     })
     category: PostCategory;
+
+    @OneToMany(() => Comment, comment => comment.post)
+    comments: Comment[];
 
     @Column({ nullable: true })
     media: string; // possibly array of strings... let's see

@@ -11,6 +11,12 @@ export enum PostCategory {
     disproof = "disproof"
 }
 
+export enum LikeType {
+    post = "post",
+    comment = "comment",
+    reply = "reply"
+}
+
 // export interface UserType extends User {
 //     User_id: number;
 //     User_username: string;

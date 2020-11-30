@@ -5,6 +5,7 @@ import { createMessage } from '../utils/createMessage';
 
 const router = Router();
 
+// maybe have to write raw sql to query only what you want
 router.get('/get/name/:boardName', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { boardName } = req.params;
 
@@ -35,6 +36,7 @@ router.get('/get', async (req, res) => {
     return res.json(boards)
 });
 
+// maybe have to write raw sql to query only what you want
 router.get('/:boardId', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { boardId } = req.params;
 
