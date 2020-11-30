@@ -6,10 +6,13 @@ import cors from 'cors';
 import userRouter from './routes/user';
 import postRouter from './routes/post';
 import boardRouter from './routes/board';
+import commentRouter from './routes/comment';
+import followRouter from './routes/follow';
+import likeRouter from './routes/like';
+import replyRouter from './routes/reply';
 import "./passport-config"
 import { connOptions } from "./constants";
 import cookieParser from "cookie-parser";
-// import { Post } from "./entities/Post";
 
 const main = async () => {
     const app = express();
@@ -38,6 +41,10 @@ const main = async () => {
     app.use('/api/user', userRouter);
     app.use('/api/post', postRouter);
     app.use('/api/board', boardRouter);
+    app.use('/api/comment', commentRouter);
+    app.use('/api/reply', replyRouter);
+    app.use('/api/like', likeRouter);
+    app.use('/api/follow', followRouter);
 
     app.listen(5000, () => {
         console.log('listening on port 5000');

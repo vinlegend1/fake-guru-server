@@ -13,7 +13,31 @@ router.get('/from/board/:boardId', async (req, res) => {
     const { boardId } = req.params;
     const { l, p } = req.query;
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
+    const page: number = typeof p !== "string" ? 0 : parseInt(p);
+
+    const posts = await getConnection().query(`
+        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        inner join board b on p."boardId" = b."boardId"
+        inner join "user" u on p."creatorId" = u.id
+        where b."boardId" = ${boardId}
+        order by p."createdAt" desc
+        limit ${limit} offset ${page * limit};
+    `).catch((err) => {
+        if (err.code === "42883") {
+            return res.status(400).json(createMessage("name invalid", true));
+        }
+        return res.status(500).json(createMessage("Something went wrong", true));
+    });
+
+    return res.json(posts)
+});
+
+router.get('/from/board/name/:boardName', async (req, res) => {
+    const { boardName } = req.params;
+    const { l, p } = req.query;
+
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     // const posts = await Post.find({
@@ -23,7 +47,7 @@ router.get('/from/board/:boardId', async (req, res) => {
     //     take: limit,
     //     skip: page * limit,
     //     where: {
-    //         boardId
+    //         boardId: board.boardId
     //     },
     //     relations: ['creator', 'board']
     // })
@@ -32,38 +56,15 @@ router.get('/from/board/:boardId', async (req, res) => {
         select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
         inner join board b on p."boardId" = b."boardId"
         inner join "user" u on p."creatorId" = u.id
-        where b."boardId" = ${boardId}
+        where b."boardName" = '${boardName}'
         order by p."createdAt" desc
         limit ${limit} offset ${page * limit};
-    `)
-
-    return res.json(posts)
-});
-
-router.get('/from/board/name/:boardName', async (req, res) => {
-    const { boardName } = req.params;
-    const { l, p } = req.query;
-
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
-    const page: number = typeof p !== "string" ? 0 : parseInt(p);
-
-    const board = await Board.findOne({ where: { boardName } });
-
-    if (!board) {
-        return res.json([]);
-    }
-
-    const posts = await Post.find({
-        order: {
-            createdAt: "DESC"
-        },
-        take: limit,
-        skip: page * limit,
-        where: {
-            boardId: board.boardId
-        },
-        relations: ['creator', 'board']
-    })
+    `).catch((err) => {
+        if (err.code === "42883") {
+            return res.status(400).json(createMessage("name invalid", true));
+        }
+        return res.status(500).json(createMessage("Something went wrong", true));
+    });
 
     return res.json(posts)
 });
@@ -80,25 +81,21 @@ router.get('/from/:username', passport.authenticate('jwt', { session: false }), 
     // console.log('l: ', typeof l)
     // console.log('p: ', p)
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const user = await User.findOne({ where: { username } });
-
-    if (!user) {
-        return res.json([]);
-    }
-
-    const posts = await Post.find({
-        order: {
-            createdAt: "DESC"
-        },
-        take: limit,
-        skip: page * limit,
-        where: {
-            creatorId: user.id
-        },
-        relations: ['creator', 'board']
+    const posts = await getConnection().query(`
+        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        inner join board b on p."boardId" = b."boardId"
+        inner join "user" u on p."creatorId" = u.id
+        where u."username" = '${username}'
+        order by p."createdAt" desc
+        limit ${limit} offset ${page * limit};
+    `).catch((err) => {
+        if (err.code === "42883") {
+            return res.status(400).json(createMessage("name invalid", true));
+        }
+        return res.status(500).json(createMessage("Something went wrong", true));
     })
 
     return res.json(posts)
@@ -109,19 +106,21 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
     const { id } = req.params;
     const { l, p } = req.query;
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const posts = await Post.find({
-        order: {
-            createdAt: "DESC"
-        },
-        take: limit,
-        skip: page * limit,
-        where: {
-            creatorId: parseInt(id)
-        },
-        relations: ['creator', 'board']
+    const posts = await getConnection().query(`
+        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        inner join board b on p."boardId" = b."boardId"
+        inner join "user" u on p."creatorId" = u.id
+        where u."id" = '${id}'
+        order by p."createdAt" desc
+        limit ${limit} offset ${page * limit};
+    `).catch((err) => {
+        if (err.code === "42883") {
+            return res.status(400).json(createMessage("name invalid", true));
+        }
+        return res.status(500).json(createMessage("Something went wrong", true));
     })
 
     return res.json(posts)
@@ -132,7 +131,20 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { id } = req.params;
 
-    const post = await Post.findOne({ where: { postId: parseInt(id) }, relations: ['creator', 'board'] });
+    // const post = await Post.findOne({ where: { postId: parseInt(id) }, relations: ['creator', 'board'] });
+
+    const post = await getConnection().query(`
+        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        inner join board b on p."boardId" = b."boardId"
+        inner join "user" u on p."creatorId" = u.id
+        where p."id" = '${id}'
+        limit 1;
+    `).catch((err) => {
+        if (err.code === "42883") {
+            return res.status(400).json(createMessage("name invalid", true));
+        }
+        return res.status(500).json(createMessage("Something went wrong", true));
+    });
 
     if (!post) {
         return res.status(400).json(createMessage("Post not found", true));

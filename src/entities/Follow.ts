@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, BaseEntity, JoinColumn, PrimaryColumn } from "typeorm";
+import { Entity, ManyToOne, BaseEntity, JoinColumn, PrimaryColumn, CreateDateColumn } from "typeorm";
 import { Board } from "./Board";
 import { User } from "./User";
 
@@ -18,4 +18,7 @@ export class Follow extends BaseEntity {
     @ManyToOne(() => Board, board => board.followers)
     @JoinColumn({ name: "boardId" })
     board: Board;
+
+    @CreateDateColumn()
+    createdAt: Date;
 }

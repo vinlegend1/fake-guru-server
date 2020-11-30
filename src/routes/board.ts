@@ -5,6 +5,7 @@ import { createMessage } from '../utils/createMessage';
 
 const router = Router();
 
+// maybe have to write raw sql to query only what you want
 router.get('/get/name/:boardName', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { boardName } = req.params;
 
@@ -21,7 +22,7 @@ router.get('/get/name/:boardName', passport.authenticate('jwt', { session: false
 router.get('/get', async (req, res) => {
     const { l, p } = req.query;
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const boards = await Board.find({
@@ -35,6 +36,7 @@ router.get('/get', async (req, res) => {
     return res.json(boards)
 });
 
+// maybe have to write raw sql to query only what you want
 router.get('/:boardId', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { boardId } = req.params;
 
