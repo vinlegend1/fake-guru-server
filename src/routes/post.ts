@@ -13,7 +13,7 @@ router.get('/from/board/:boardId', async (req, res) => {
     const { boardId } = req.params;
     const { l, p } = req.query;
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const posts = await getConnection().query(`
@@ -37,7 +37,7 @@ router.get('/from/board/name/:boardName', async (req, res) => {
     const { boardName } = req.params;
     const { l, p } = req.query;
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     // const posts = await Post.find({
@@ -81,7 +81,7 @@ router.get('/from/:username', passport.authenticate('jwt', { session: false }), 
     // console.log('l: ', typeof l)
     // console.log('p: ', p)
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const posts = await getConnection().query(`
@@ -106,7 +106,7 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
     const { id } = req.params;
     const { l, p } = req.query;
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const posts = await getConnection().query(`

@@ -8,7 +8,7 @@ const router = Router();
 // get all comments from a post
 router.get('/get', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { pid, l, p } = req.query;
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     if (!pid || typeof pid !== "string") {

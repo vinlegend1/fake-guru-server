@@ -22,7 +22,7 @@ router.get('/get/name/:boardName', passport.authenticate('jwt', { session: false
 router.get('/get', async (req, res) => {
     const { l, p } = req.query;
 
-    const limit: number = typeof l !== "string" ? 10 : parseInt(l);
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const boards = await Board.find({

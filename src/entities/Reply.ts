@@ -11,6 +11,9 @@ export class Reply extends BaseEntity {
     @Column()
     creatorId: number;
 
+    @Column()
+    body: string;
+
     @ManyToOne(() => User, user => user.replies)
     @JoinColumn({ name: 'creatorId' })
     creator: User;
