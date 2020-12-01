@@ -40,18 +40,6 @@ router.get('/from/board/name/:boardName', async (req, res) => {
     const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    // const posts = await Post.find({
-    //     order: {
-    //         createdAt: "DESC"
-    //     },
-    //     take: limit,
-    //     skip: page * limit,
-    //     where: {
-    //         boardId: board.boardId
-    //     },
-    //     relations: ['creator', 'board']
-    // })
-
     const posts = await getConnection().query(`
         select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
         inner join board b on p."boardId" = b."boardId"
@@ -128,10 +116,22 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
 
 // ====== Find by User -- End -- ======
 
+router.get('/get/follow', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { id } = req.user as User;
+
+    const posts = await getConnection().query(`
+    select p."postId", p.title, p.body, p.media, p."createdAt", p."creatorId", u.username, b."boardName", b."boardId" from follow f
+    inner join board b on f."boardId" = b."boardId"
+    inner join post p on p."boardId" = b."boardId"
+    inner join "user" u on u."id" = p."creatorId"
+    where f."userId" = ${id};
+    `)
+
+    return res.json(posts);
+});
+
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { id } = req.params;
-
-    // const post = await Post.findOne({ where: { postId: parseInt(id) }, relations: ['creator', 'board'] });
 
     const post = await getConnection().query(`
         select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p

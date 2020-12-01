@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import passport from 'passport';
+import { User } from '../entities/User';
 import { Board } from '../entities/Board';
 import { createMessage } from '../utils/createMessage';
+import { getConnection } from 'typeorm';
 
 const router = Router();
 
@@ -69,6 +71,18 @@ router.post('/new', passport.authenticate('jwt', { session: false }), async (req
         });
 
     res.json(newBoard);
-})
+});
+
+router.get('/get/follow', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { id } = req.user as User;
+
+    const boards = await getConnection().query(`
+        select b."boardId", b."boardName", b."boardDescription" from follow f
+        inner join board b on f."boardId" = b."boardId"
+        where f."userId" = ${id};
+    `);
+
+    res.json(boards);
+});
 
 export default router;
