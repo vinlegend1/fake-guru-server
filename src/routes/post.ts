@@ -118,13 +118,18 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
 
 router.get('/get/follow', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { id } = req.user as User;
+    const { l, p } = req.query;
+
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
+    const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const posts = await getConnection().query(`
     select p."postId", p.title, p.body, p.media, p."createdAt", p."creatorId", u.username, b."boardName", b."boardId" from follow f
     inner join board b on f."boardId" = b."boardId"
     inner join post p on p."boardId" = b."boardId"
     inner join "user" u on u."id" = p."creatorId"
-    where f."userId" = ${id};
+    where f."userId" = ${id}
+    limit ${limit} offset ${page * limit};
     `)
 
     return res.json(posts);

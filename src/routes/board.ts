@@ -75,11 +75,16 @@ router.post('/new', passport.authenticate('jwt', { session: false }), async (req
 
 router.get('/get/follow', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { id } = req.user as User;
+    const { l, p } = req.query;
+
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
+    const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const boards = await getConnection().query(`
         select b."boardId", b."boardName", b."boardDescription" from follow f
         inner join board b on f."boardId" = b."boardId"
-        where f."userId" = ${id};
+        where f."userId" = ${id}
+        limit ${limit} offset ${limit * page};
     `);
 
     res.json(boards);
