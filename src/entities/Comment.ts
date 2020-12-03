@@ -22,9 +22,6 @@ export class Comment extends BaseEntity {
     @Column({ nullable: true })
     media: string;
 
-    @Column({ type: "int", default: 0 })
-    value: number;
-
     @Column()
     postId: number;
 

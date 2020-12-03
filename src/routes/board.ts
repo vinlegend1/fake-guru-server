@@ -4,6 +4,7 @@ import { User } from '../entities/User';
 import { Board } from '../entities/Board';
 import { createMessage } from '../utils/createMessage';
 import { getConnection } from 'typeorm';
+import { returnColsFromGetFollowBoard } from '../constants';
 
 const router = Router();
 
@@ -81,10 +82,11 @@ router.get('/get/follow', passport.authenticate('jwt', { session: false }), asyn
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const boards = await getConnection().query(`
-        select b."boardId", b."boardName", b."boardDescription" from follow f
+        select ${returnColsFromGetFollowBoard} from follow f
         inner join board b on f."boardId" = b."boardId"
         where f."userId" = ${id}
-        limit ${limit} offset ${limit * page};
+        order by b."createdAt" desc, b.popularity desc
+        limit ${limit} offset ${page * limit};
     `);
 
     res.json(boards);

@@ -5,6 +5,7 @@ import { Post } from '../entities/Post';
 import { createMessage } from '../utils/createMessage';
 import { Board } from '../entities/Board';
 import { getConnection } from 'typeorm';
+import { returnColsFromPosts } from '../constants';
 
 const router = Router();
 
@@ -73,7 +74,7 @@ router.get('/from/:username', passport.authenticate('jwt', { session: false }), 
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const posts = await getConnection().query(`
-        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        select ${returnColsFromPosts} from post p
         inner join board b on p."boardId" = b."boardId"
         inner join "user" u on p."creatorId" = u.id
         where u."username" = '${username}'
@@ -98,7 +99,7 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const posts = await getConnection().query(`
-        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        select ${returnColsFromPosts} from post p
         inner join board b on p."boardId" = b."boardId"
         inner join "user" u on p."creatorId" = u.id
         where u."id" = '${id}'
@@ -124,7 +125,7 @@ router.get('/get/follow', passport.authenticate('jwt', { session: false }), asyn
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
     const posts = await getConnection().query(`
-    select p."postId", p.title, p.body, p.media, p."createdAt", p."creatorId", u.username, b."boardName", b."boardId" from follow f
+    select ${returnColsFromPosts} from follow f
     inner join board b on f."boardId" = b."boardId"
     inner join post p on p."boardId" = b."boardId"
     inner join "user" u on u."id" = p."creatorId"
@@ -139,7 +140,7 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), async (req,
     const { id } = req.params;
 
     const post = await getConnection().query(`
-        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
+        select ${returnColsFromPosts} from post p
         inner join board b on p."boardId" = b."boardId"
         inner join "user" u on p."creatorId" = u.id
         where p."id" = '${id}'
