@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import passport from 'passport';
+import { User } from '../entities/User';
 import { Board } from '../entities/Board';
 import { createMessage } from '../utils/createMessage';
+import { getConnection } from 'typeorm';
+import { returnColsFromGetFollowBoard } from '../constants';
 
 const router = Router();
 
@@ -69,6 +72,24 @@ router.post('/new', passport.authenticate('jwt', { session: false }), async (req
         });
 
     res.json(newBoard);
-})
+});
+
+router.get('/get/follow', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const { id } = req.user as User;
+    const { l, p } = req.query;
+
+    const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
+    const page: number = typeof p !== "string" ? 0 : parseInt(p);
+
+    const boards = await getConnection().query(`
+        select ${returnColsFromGetFollowBoard} from follow f
+        inner join board b on f."boardId" = b."boardId"
+        where f."userId" = ${id}
+        order by b."createdAt" desc, b.popularity desc
+        limit ${limit} offset ${page * limit};
+    `);
+
+    res.json(boards);
+});
 
 export default router;
