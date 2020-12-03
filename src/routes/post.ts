@@ -6,6 +6,13 @@ import { createMessage } from '../utils/createMessage';
 import { Board } from '../entities/Board';
 import { getConnection } from 'typeorm';
 import { returnColsFromPosts } from '../constants';
+import {
+    queryAllPostsFromCreatorId,
+    queryAllPostsFromFollowed,
+    queryAllPostsFromUsername,
+    queryAllPostsGivenBoardId,
+    queryAllPostsGivenBoardName
+} from '../utils/sqlQueries';
 
 const router = Router();
 
@@ -17,14 +24,9 @@ router.get('/from/board/:boardId', async (req, res) => {
     const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const posts = await getConnection().query(`
-        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
-        inner join board b on p."boardId" = b."boardId"
-        inner join "user" u on p."creatorId" = u.id
-        where b."boardId" = ${boardId}
-        order by p."createdAt" desc
-        limit ${limit} offset ${page * limit};
-    `).catch((err) => {
+    const posts = await getConnection().query(
+        queryAllPostsGivenBoardId(parseInt(boardId), limit, page * limit)
+    ).catch((err) => {
         if (err.code === "42883") {
             return res.status(400).json(createMessage("name invalid", true));
         }
@@ -41,14 +43,9 @@ router.get('/from/board/name/:boardName', async (req, res) => {
     const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const posts = await getConnection().query(`
-        select p."postId", p.title, p.body, p."createdAt", b."boardId", b."boardName", u.id creatorId, u.username from post p
-        inner join board b on p."boardId" = b."boardId"
-        inner join "user" u on p."creatorId" = u.id
-        where b."boardName" = '${boardName}'
-        order by p."createdAt" desc
-        limit ${limit} offset ${page * limit};
-    `).catch((err) => {
+    const posts = await getConnection().query(
+        queryAllPostsGivenBoardName(boardName, limit, page * limit)
+    ).catch((err) => {
         if (err.code === "42883") {
             return res.status(400).json(createMessage("name invalid", true));
         }
@@ -73,14 +70,9 @@ router.get('/from/:username', passport.authenticate('jwt', { session: false }), 
     const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const posts = await getConnection().query(`
-        select ${returnColsFromPosts} from post p
-        inner join board b on p."boardId" = b."boardId"
-        inner join "user" u on p."creatorId" = u.id
-        where u."username" = '${username}'
-        order by p."createdAt" desc
-        limit ${limit} offset ${page * limit};
-    `).catch((err) => {
+    const posts = await getConnection().query(
+        queryAllPostsFromUsername(username, limit, page * limit)
+    ).catch((err) => {
         if (err.code === "42883") {
             return res.status(400).json(createMessage("name invalid", true));
         }
@@ -98,14 +90,9 @@ router.get('/from/user/:id', passport.authenticate('jwt', { session: false }), a
     const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const posts = await getConnection().query(`
-        select ${returnColsFromPosts} from post p
-        inner join board b on p."boardId" = b."boardId"
-        inner join "user" u on p."creatorId" = u.id
-        where u."id" = '${id}'
-        order by p."createdAt" desc
-        limit ${limit} offset ${page * limit};
-    `).catch((err) => {
+    const posts = await getConnection().query(
+        queryAllPostsFromCreatorId(parseInt(id), limit, page * limit)
+    ).catch((err) => {
         if (err.code === "42883") {
             return res.status(400).json(createMessage("name invalid", true));
         }
@@ -124,14 +111,9 @@ router.get('/get/follow', passport.authenticate('jwt', { session: false }), asyn
     const limit: number = typeof l !== "string" ? 10 : Math.min(50, parseInt(l));
     const page: number = typeof p !== "string" ? 0 : parseInt(p);
 
-    const posts = await getConnection().query(`
-    select ${returnColsFromPosts} from follow f
-    inner join board b on f."boardId" = b."boardId"
-    inner join post p on p."boardId" = b."boardId"
-    inner join "user" u on u."id" = p."creatorId"
-    where f."userId" = ${id}
-    limit ${limit} offset ${page * limit};
-    `)
+    const posts = await getConnection().query(
+        queryAllPostsFromFollowed(id, limit, page * limit)
+    )
 
     return res.json(posts);
 });
@@ -141,9 +123,14 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), async (req,
 
     const post = await getConnection().query(`
         select ${returnColsFromPosts} from post p
+        left join post_like l on l."postId" = p."postId"
+        left join comment c on c."postId" = p."postId"
         inner join board b on p."boardId" = b."boardId"
         inner join "user" u on p."creatorId" = u.id
-        where p."id" = '${id}'
+        where p."postId" = ${id}
+        group by p."postId", p.title, p.body, p."createdAt",
+            b."boardId", b."boardName", creatorId, u.username,
+            p.category
         limit 1;
     `).catch((err) => {
         if (err.code === "42883") {
